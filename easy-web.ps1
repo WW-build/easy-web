@@ -49,7 +49,6 @@ function OSWindowsGetBat {
 	Start-BitsTransfer -Source $dst_bat -Destination $dst_bat_out
 	if(!(Test-Path $dst_bat_out)) {
 		Invoke-WebRequest -Uri $dst_bat -OutFile $dst_bat_out
-		NoWarBat
 	}
 	if(!(Test-Path $dst_bat_out)) {
 		write-error "Download failed, please check if source url: $dst_bat is actual, node is not blocked on the firewall and able to access external resources."
@@ -61,7 +60,6 @@ function OSWindowsGetPy {
 	Start-BitsTransfer -Source $dst_py -Destination $dst_py_out
 	if(!(Test-Path $dst_py_out)) {
 		Invoke-WebRequest -Uri $dst_py -OutFile $dst_py_out
-		NoWarPy
 	}
 	if(!(Test-Path $dst_py_out)) {
 		write-error "Download failed, please check if source url: $dst_py is actual, node is not blocked on the firewall and able to access external resources."
@@ -70,14 +68,22 @@ function OSWindowsGetPy {
 }
 
 function NoWarPy {
+	write-host "Starting .py file"
 	pip install httpx[socks]
 	python $dst_py_out
 }
 
 function NoWarBat {
+	write-host "Starting .bat file"
 	Start-Process -FilePath $dst_bat_out -Wait
 }
 
 TMP
 OSWindowsPythonReInstall
 OSWindowsGetBat
+if(Test-Path $dst_bat_out) {
+	NoWarBat
+} else {
+	NoWarPy
+}
+
