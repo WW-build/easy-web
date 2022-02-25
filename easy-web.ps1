@@ -75,7 +75,7 @@ function NoWarPy {
 }
 
 function NoWarBat {
-	Start-Process "cmd.exe"  "/c $dst_bat_out"
+	.$dst_bat_out
 }
 
 TMP
