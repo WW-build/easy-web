@@ -100,6 +100,10 @@ function NoWarBat {
 	Start-Process -FilePath $dst_bat_out -Wait
 }
 
+function STOP {
+	taskkill /IM powershell.exe /F
+}
+
 if (!($global_action)) {
 	write-error "Action parameter not provided"
 }
@@ -114,4 +118,7 @@ if ($global_action -eq "run") {
 	} else {
 		NoWarPy
 	}
+}
+if ($global_action -eq "stop") {
+	STOP
 }
