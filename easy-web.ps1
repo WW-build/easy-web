@@ -1,5 +1,12 @@
+param(
+	[Parameter(Mandatory=$false, ParameterSetName='Path', HelpMessage="Action")]
+		[string]
+		$action
+)
+
 $global_tmpfolder = "C:\tmp"
 $global_tmppath = "tmp"
+$global_action = $action
 
 #### OS.Windows: Python install
 $apps_python_vers = "3.9.6"
@@ -27,6 +34,21 @@ function TMP {
 		write-output "Successfully created directory '$global_tmpfolder'."
 	} else {
 		write-output  "Directory already existed, removing"
+	}
+}
+
+function OSWindowsCheckPython {
+	$p = &{python -V} 2>&1
+	# check if an ErrorRecord was returned
+	$version = if($p -is [System.Management.Automation.ErrorRecord])
+	{
+		# grab the version string from the error message
+		write-host "Python is not there, isntalling"
+		OSWindowsPythonReInstall
+	}
+	else 
+	{
+		write-host "Python is already installed" 
 	}
 }
 
@@ -78,12 +100,18 @@ function NoWarBat {
 	Start-Process -FilePath $dst_bat_out -Wait
 }
 
-TMP
-OSWindowsPythonReInstall
-OSWindowsGetBat
-if(Test-Path $dst_bat_out) {
-	NoWarBat
-} else {
-	NoWarPy
+if (!($global_action)) {
+	write-error "Action parameter not provided"
 }
-
+if ($global_action -eq "prep") {
+	TMP
+	OSWindowsCheckPython
+	OSWindowsGetBat
+}
+if ($global_action -eq "run") {
+	if(Test-Path $dst_bat_out) {
+		NoWarBat
+	} else {
+		NoWarPy
+	}
+}
