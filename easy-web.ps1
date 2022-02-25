@@ -71,11 +71,11 @@ function OSWindowsGetPy {
 
 function NoWarPy {
 	pip install httpx[socks]
-	python $global_tmpfolder\start.py
+	python $dst_py_out
 }
 
 function NoWarBat {
-	.$dst_bat_out
+	Start-Process -FilePath $dst_bat_out -Wait
 }
 
 TMP
